@@ -61,8 +61,8 @@ export default class Deployment extends Workload {
         }
       }, {
         op:    'replace',
-        path:  '/metadata/annotations',
-        value: { 'deployment.kubernetes.io/revision': revision.metadata.annotations['deployment.kubernetes.io/revision'] }
+        path:  '/metadata/annotations/deployment.kubernetes.io~1revision',
+        value: revision.metadata.annotations['deployment.kubernetes.io/revision']
       }
     ];
 

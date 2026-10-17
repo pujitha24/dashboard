@@ -90,4 +90,33 @@ describe('class Deployment', () => {
       expect(deployment.replicaSetId).toStrictEqual(expected);
     });
   });
+
+  describe('rollBack', () => {
+    it('should only patch the revision annotation and keep other deployment annotations', async() => {
+      const deployment = new Deployment({
+        type:     WORKLOAD_TYPES.DEPLOYMENT,
+        metadata: {
+          name:        'any-name',
+          namespace:   'any-namespace',
+          annotations: { 'deployment.kubernetes.io/revision': '2', 'custom/annotation': 'value' }
+        },
+      });
+      const revision = {
+        metadata: { annotations: { 'deployment.kubernetes.io/revision': '1' } },
+        spec:     { template: { metadata: { labels: { app: 'a', 'pod-template-hash': 'x' } }, spec: { containers: [] } } }
+      };
+
+      deployment.rollBackWorkload = jest.fn();
+
+      await deployment.rollBack({ id: 'local' }, deployment, revision);
+
+      const body = (deployment.rollBackWorkload as jest.Mock).mock.calls[0][3];
+
+      expect(body[1]).toStrictEqual({
+        op:    'replace',
+        path:  '/metadata/annotations/deployment.kubernetes.io~1revision',
+        value: '1'
+      });
+    });
+  });
 });
