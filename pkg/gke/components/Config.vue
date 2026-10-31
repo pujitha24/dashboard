@@ -227,8 +227,11 @@ export default defineComponent({
       },
       set(neu: boolean) {
         if (neu) {
+          const selectedZone = this.zones.find((z) => z.name === this.zone);
+          const zoneRegion = selectedZone ? getGKERegionFromZone(selectedZone) : undefined;
+
           this.$emit('update:zone', null);
-          this.$emit('update:region', this.defaultRegion);
+          this.$emit('update:region', zoneRegion || this.defaultRegion);
         } else {
           this.$emit('update:region', null);
           this.setZone({ name: this.defaultZone });

@@ -344,4 +344,25 @@ describe('gke Config', () => {
 
     expect((wrapper.vm as any).extraZonesDisabledTooltip).toBe(expectedTooltip);
   });
+
+  it('should keep the region of the selected zone when switching from zonal to regional', async() => {
+    const wrapper = shallowMount(Config, {
+      props: {
+        mode:                 'create',
+        zone:                 'us-east4-c',
+        region:               '',
+        cloudCredentialId:    'abc',
+        projectId:            'test-project',
+        isNewOrUnprovisioned: true
+      },
+      ...requiredSetup()
+    });
+
+    await flushPromises();
+
+    (wrapper.vm as any).useRegion = true;
+
+    expect(wrapper.emitted('update:region')).toStrictEqual([['us-east4']]);
+    expect(wrapper.emitted('update:zone')).toStrictEqual([[null]]);
+  });
 });
